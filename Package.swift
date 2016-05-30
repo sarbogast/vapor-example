@@ -4,7 +4,7 @@ let package = Package(
     name: "VaporApp",
     dependencies: [
         .Package(url: "https://github.com/sarbogast/vapor.git", majorVersion: 0, minor: 14),
-        .Package(url: "https://github.com/PlanTeam/MongoKitten.git", majorVersion: 0, minor: 10)
+        .Package(url: "https://github.com/LoganWright/MongoKitten.git", majorVersion: 0, minor: 10)
     ],
     exclude: [
       "Deploy",
