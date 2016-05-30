@@ -19,7 +19,7 @@ class TodoController: Controller {
     func index(_ request: Request) throws -> ResponseRepresentable {
         if let todoDao = todoDao {
             if let todos = todoDao.findAllTodos() {
-                return Json.array(todos.map({ (todo:Todo) -> Json in
+                return JSON.array(todos.map({ (todo:Todo) -> JSON in
                     todo.url = "http://\(request.uri.host!)/todos/\(todo.id!)"
                     return todo.makeJson()
                 }))

@@ -1,7 +1,22 @@
 import S4
 import Vapor
 
-let app = Application()
+// **** WARNING ****
+//
+// THIS ASSUMES THAT IF YOU'RE NOT ON LINUX, YOU'RE RUNNING FROM XCODE
+// IF YOU'RE RUNNING ON AN OSX SERVER, YOU SHOULD STILL USE WORKDIR="./"
+//
+#if os(Linux)
+let workDir = "./"
+#else
+var workDir: String {
+    let parent = #file.characters.split(separator: "/").map(String.init).dropLast().joined(separator: "/")
+    let path = "/\(parent)/.."
+    return path
+    }
+#endif
+
+let app = Application(workDir: workDir)
 
 /**
 	This first route will return the welcome.html
@@ -43,7 +58,8 @@ app.resource("todos", controller: TodoController.self)
 		app.get() { ... }
 	}`
 */
-app.middleware.append(CorsMiddleware())
+app.add(CorsMiddleware())
 
 // Print what link to visit for default port
-app.start(port: 8080)
+print("Visit: \(app.host):\(app.port)")
+app.start()

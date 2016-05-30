@@ -21,9 +21,9 @@ final class Todo {
 	passed into Json arrays and dictionaries
 	as if it were a native JSON type.
 */
-extension Todo: JsonRepresentable {
-    func makeJson() -> Json {
-        var json = Json(["completed":completed])
+extension Todo: JSONRepresentable {
+    func makeJson() -> JSON {
+        var json = JSON(["completed":completed])
         if let url = url {
             json["url"] = .string(url)
         }
@@ -34,7 +34,7 @@ extension Todo: JsonRepresentable {
             json["title"] = .string(title)
         }
         if let order = order {
-            json["order"] = .number(Double(order))
+            json["order"] = .number(.integer(order))
         }
         return json
     }
