@@ -1,5 +1,22 @@
 import Vapor
 
+extension URI {
+    var hostAndPort: String {
+        // there's a bug, host is `host:port`, port doesn't work. Fix on core in future
+        guard let host = self.host else {
+            return ""
+        }
+
+        let comps = host.components(separatedBy: ":")
+
+        if comps.count == 1, let first = comps.first {
+            return first
+        } else {
+            return comps.joined(separator: ":")
+        }
+    }
+}
+
 class TodoController: Controller {
     typealias Item = Todo
     
@@ -20,7 +37,7 @@ class TodoController: Controller {
         if let todoDao = todoDao {
             if let todos = todoDao.findAllTodos() {
                 return JSON.array(todos.map({ (todo:Todo) -> JSON in
-                    todo.url = "http://\(request.uri.host!)/todos/\(todo.id!)"
+                    todo.url = "http://\(request.uri.hostAndPort)/todos/\(todo.id!)"
                     return todo.makeJson()
                 }))
             } else {
@@ -43,7 +60,7 @@ class TodoController: Controller {
                 completed = false
             }
             if let todo = todoDao.createTodo(Todo(id: nil, title: title, completed: completed, order: request.data["order"].int)){
-                todo.url = "http://\(request.uri.host!)/todos/\(todo.id!)"
+                todo.url = "http://\(request.uri.hostAndPort)/todos/\(todo.id!)"
                 return todo
             } else {
                 throw Abort.internalServerError
@@ -61,7 +78,7 @@ class TodoController: Controller {
         if let todoDao = todoDao {
             if let id = todo.id {
                 if let todo = todoDao.getTodoWithId(id) {
-                    todo.url = "http://\(request.uri.host!)/todos/\(todo.id!)"
+                    todo.url = "http://\(request.uri.hostAndPort)/todos/\(todo.id!)"
                     return todo
                 } else {
                     throw Abort.notFound
@@ -79,7 +96,7 @@ class TodoController: Controller {
             if let id = todo.id, title = request.data["title"]?.string, completed = request.data["completed"]?.bool, order = request.data["order"]?.int {
                 let todoToUpdate = Todo(id: id, title: title, completed: completed, order: order)
                 if let updatedTodo = todoDao.updateTodo(todoToUpdate) {
-                    updatedTodo.url = "http://\(request.uri.host!)/todos/\(updatedTodo.id!)"
+                    updatedTodo.url = "http://\(request.uri.hostAndPort)/todos/\(updatedTodo.id!)"
                     return updatedTodo
                 } else {
                     throw Abort.notFound
@@ -107,7 +124,7 @@ class TodoController: Controller {
                     changes["order"] = order
                 }
                 if let updatedTodo = todoDao.modifyTodoWithId(id, changes: changes) {
-                    updatedTodo.url = "http://\(request.uri.host!)/todos/\(updatedTodo.id!)"
+                    updatedTodo.url = "http://\(request.uri.hostAndPort)/todos/\(updatedTodo.id!)"
                     return updatedTodo
                 } else {
                     throw Abort.notFound
